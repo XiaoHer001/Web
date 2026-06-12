@@ -4,11 +4,13 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-    <title>MindAR 图像目标识别 - 带交互</title>
 
-    <!-- 核心库 -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+
+    <title>MindAR 图像目标识别</title>
+
     <script src="./libs/aframe.min.js"></script>
+
     <script src="./libs/mindar-image-aframe.prod.js"></script>
 
     <style>
@@ -26,10 +28,13 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
+
             background: rgba(0, 0, 0, .7);
             color: #fff;
+
             padding: 10px 16px;
             border-radius: 10px;
+
             font-family: sans-serif;
         }
     </style>
@@ -43,79 +48,77 @@
     </div>
 
     <a-scene mindar-image="
-        imageTargetSrc: ./targets/XiaoHer.mind;
-        autoStart: true;
-        uiScanning: yes;
-        uiLoading: yes;
-        " color-space="sRGB" renderer="
-        colorManagement: true;
-        physicallyCorrectLights: true;
-        " vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded>
+imageTargetSrc: ./targets/XiaoHer.mind;
+autoStart: true;
+uiScanning: yes;
+uiLoading: yes;
+" color-space="sRGB" renderer="
+colorManagement: true;
+physicallyCorrectLights: true;
+" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded>
 
         <!-- 模型资源 -->
         <a-assets>
-            <a-asset-item id="robotModel" src="./assets/Card.glb"></a-asset-item>
+
+            <a-asset-item id="robotModel" src="./assets/Card.glb">
+            </a-asset-item>
+
+            <!-- 唯一修改点：在 audio 标签中添加了 loop 属性 -->
+            <audio id="backgroundMusic" src="./assets/music.mp3" preload="auto" loop></audio>
+
         </a-assets>
 
-        <!-- 修改：为摄像头添加 cursor 和 raycaster 组件以启用点击 -->
-        <a-camera position="0 0 0" look-controls="enabled:false" cursor="rayOrigin: mouse; fuse: false"
-            raycaster="objects: .clickable">
+        <!-- 摄像头 -->
+
+        <a-camera position="0 0 0" look-controls="enabled:false">
         </a-camera>
 
         <!-- 第0张识别图 -->
+
         <a-entity id="target0" mindar-image-target="targetIndex: 0">
 
-            <!-- 
-                修改：
-                1. 添加 class="clickable" 使其可以被点击。
-                2. 添加 animation 组件，实现点击后放大再缩小的“弹跳”效果。
-            -->
-            <a-gltf-model id="robot" src="#robotModel" position="0 0 0" rotation="90 0 0" scale="1 1 1"
-                class="clickable"
-                animation="property: scale; to: 1.2 1.2 1.2; startEvents: click; dur: 300; dir: alternate; loop: 1">
-            </a-gltf-model>
+            <a-gltf-model id="robot" src="#robotModel" position="0 0 0" rotation="90 0 0" scale="1 1 1" visible="true"
+                material="shader: flat; color: #FFF;">
 
-            <!-- 
-                新增：一个可点击的“官网”按钮 
-                它也是 clickable 的，并且有自己的位置和样式。
-            -->
-            <a-plane id="website-button" class="clickable" position="0 -0.8 0" rotation="0 0 0" width="1.2" height="0.3"
-                color="#007BFF">
-                <!-- 按钮上的文字 -->
-                <a-text value="访问官网" align="center" color="#FFF" width="2.5"></a-text>
-            </a-plane>
+            </a-gltf-model>
 
         </a-entity>
 
     </a-scene>
 
     <script>
-        const statusEl = document.getElementById("status");
-        const target = document.querySelector("#target0");
-        
-        // 新增：获取新添加的按钮元素
-        const websiteButton = document.querySelector("#website-button");
+
+        const statusEl =
+            document.getElementById("status");
+
+        const target =
+            document.querySelector("#target0");
+
+        const music = document.querySelector("#backgroundMusic");
 
         target.addEventListener("targetFound", () => {
+
             console.log("识别成功");
-            // 修改提示语，引导用户进行交互
-            statusEl.innerHTML = "✅ 图片已识别，请点击模型或按钮";
+
+            statusEl.innerHTML =
+                "✅ 图片已识别";
+
+            music.play();
+
         });
 
         target.addEventListener("targetLost", () => {
+
             console.log("目标丢失");
-            statusEl.innerHTML = "🔍 请对准识别图";
+
+            statusEl.innerHTML =
+                "🔍 请对准识别图";
+
+            music.pause();
+            music.currentTime = 0;
+
         });
 
-        // 新增：为“官网”按钮添加点击事件监听
-        websiteButton.addEventListener("click", (event) => {
-            // 阻止事件冒泡，以防同时触发其他元素的点击事件
-            event.stopPropagation();
-
-            console.log("官网按钮被点击");
-            // 在新标签页中打开一个链接
-            window.open("https://github.com/hiukim/mind-ar-js", "_blank");
-        });
     </script>
 
 </body>
