@@ -4,14 +4,12 @@
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>MindAR Demo - 添加全局光</title>
 
-    <title>MindAR Demo</title>
-
-    <script src="/libs/aframe.min.js"></script>
-
-    <script src="/libs/mindar-image-aframe.prod.js"></script>
+    <!-- 【已修正】路径改为相对路径，以在GitHub Pages上正常工作 -->
+    <script src="./libs/aframe.min.js"></script>
+    <script src="./libs/mindar-image-aframe.prod.js"></script>
 
     <style>
         html,
@@ -28,13 +26,10 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
-
             background: rgba(0, 0, 0, .7);
             color: #fff;
-
             padding: 10px 16px;
             border-radius: 10px;
-
             font-family: sans-serif;
         }
     </style>
@@ -48,68 +43,50 @@
     </div>
 
     <a-scene mindar-image="
-imageTargetSrc: ./targets/XiaoHer.mind;
-autoStart: true;
-uiScanning: yes;
-uiLoading: yes;
-" color-space="sRGB" renderer="
-colorManagement: true;
-physicallyCorrectLights: true;
-" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded>
+        imageTargetSrc: ./targets/XiaoHer.mind;
+        autoStart: true;
+        uiScanning: yes;
+        uiLoading: yes;
+        " color-space="sRGB" renderer="
+        colorManagement: true;
+        physicallyCorrectLights: true;
+        " vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded>
+
+        <!-- 添加环境光和方向光，确保模型有基础亮度和立体感 -->
+        <a-light type="ambient" color="#888"></a-light>
+        <a-light type="directional" intensity="0.8" position="0 5 5"></a-light>
 
         <!-- 模型资源 -->
-
         <a-assets>
-
-            <a-asset-item id="robotModel" src="./assets/Cube.glb">
-            </a-asset-item>
-
+            <!-- 【已修正】确保路径为相对路径 -->
+            <a-asset-item id="robotModel" src="./assets/Cube.glb"></a-asset-item>
         </a-assets>
 
         <!-- 摄像头 -->
-
-        <a-camera position="0 0 0" look-controls="enabled:false">
-        </a-camera>
+        <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
         <!-- 第0张识别图 -->
-
         <a-entity id="target0" mindar-image-target="targetIndex: 0">
-
             <a-gltf-model id="robot" src="#robotModel" position="0 0 0" rotation="0 0 0" scale="0.5 0.5 0.5"
                 visible="true">
-
             </a-gltf-model>
-
         </a-entity>
 
     </a-scene>
 
     <script>
-
-        const statusEl =
-            document.getElementById("status");
-
-        const target =
-            document.querySelector("#target0");
+        const statusEl = document.getElementById("status");
+        const target = document.querySelector("#target0");
 
         target.addEventListener("targetFound", () => {
-
             console.log("识别成功");
-
-            statusEl.innerHTML =
-                "✅ 图片已识别";
-
+            statusEl.innerHTML = "✅ 图片已识别";
         });
 
         target.addEventListener("targetLost", () => {
-
             console.log("目标丢失");
-
-            statusEl.innerHTML =
-                "🔍 请对准识别图";
-
+            statusEl.innerHTML = "🔍 请对准识别图";
         });
-
     </script>
 
 </body>

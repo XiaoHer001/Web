@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MindAR 视频播放Demo</title>
+    <title>MindAR 视频播放Demo (尺寸匹配 & 高亮)</title>
 
-    <!-- 引入A-Frame和MindAR库 -->
-    <script src="/libs/aframe.min.js"></script>
-    <script src="/libs/mindar-image-aframe.prod.js"></script>
+    <!-- 【已修正】路径改为相对路径，以在GitHub Pages上正常工作 -->
+    <script src="./libs/aframe.min.js"></script>
+    <script src="./libs/mindar-image-aframe.prod.js"></script>
 
     <style>
         html,
@@ -52,6 +52,7 @@
 
         <!-- 资源管理器 -->
         <a-assets>
+            <!-- 【已修正】确保路径为相对路径 -->
             <video id="my-video" src="./assets/video.mp4" muted loop="true" playsinline webkit-playsinline></video>
         </a-assets>
 
@@ -60,18 +61,6 @@
 
         <!-- 识别图目标实体 -->
         <a-entity id="video-target" mindar-image-target="targetIndex: 0">
-            <!-- 
-                【核心改动在这里】
-                用于播放视频的平面:
-
-                1. 尺寸调整 (width & height):
-                   - width="1" 表示平面的宽度与识别图的宽度完全相等。
-                   - height="0.5625" 是根据你的图片比例计算得出的 (720 / 1280 = 0.5625)，确保视频不变形。
-                
-                2. 亮度调整 (material):
-                   - material="shader: flat" 使用不受光照影响的着色器，让视频以原始亮度显示。
-                   - color="#FFF" 确保材质本身是白色，不会给视频染色。
-             -->
             <a-plane src="#my-video" position="0 0 0" rotation="0 0 0" width="1" height="0.5625"
                 material="shader: flat; color: #FFF;">
             </a-plane>
