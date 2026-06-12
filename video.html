@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MindAR 视频播放Demo</title>
+
+    <!-- 引入A-Frame和MindAR库 -->
+    <script src="/libs/aframe.min.js"></script>
+    <script src="/libs/mindar-image-aframe.prod.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #status {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: rgba(0, 0, 0, .7);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status">
+        请对准指定的识别图...
+    </div>
+
+    <a-scene mindar-image="
+        imageTargetSrc: ./targets/target_02.mind;
+        maxTrack: 1;
+        autoStart: true;
+        uiScanning: yes;
+        uiLoading: yes;
+        " color-space="sRGB" renderer="
+        colorManagement: true;
+        physicallyCorrectLights: true;
+        " vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded>
+
+        <!-- 资源管理器 -->
+        <a-assets>
+            <video id="my-video" src="./assets/video.mp4" muted loop="true" playsinline webkit-playsinline></video>
+        </a-assets>
+
+        <!-- 摄像头 -->
+        <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+
+        <!-- 识别图目标实体 -->
+        <a-entity id="video-target" mindar-image-target="targetIndex: 0">
+            <!-- 
+                【核心改动在这里】
+                用于播放视频的平面:
+
+                1. 尺寸调整 (width & height):
+                   - width="1" 表示平面的宽度与识别图的宽度完全相等。
+                   - height="0.5625" 是根据你的图片比例计算得出的 (720 / 1280 = 0.5625)，确保视频不变形。
+                
+                2. 亮度调整 (material):
+                   - material="shader: flat" 使用不受光照影响的着色器，让视频以原始亮度显示。
+                   - color="#FFF" 确保材质本身是白色，不会给视频染色。
+             -->
+            <a-plane src="#my-video" position="0 0 0" rotation="0 0 0" width="1" height="0.5625"
+                material="shader: flat; color: #FFF;">
+            </a-plane>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusEl = document.getElementById("status");
+            const videoTarget = document.querySelector("#video-target");
+            const video = document.querySelector("#my-video");
+
+            videoTarget.addEventListener("targetFound", () => {
+                console.log("识别成功，开始播放视频");
+                statusEl.innerHTML = "✅ 识别成功，正在播放";
+                video.play();
+            });
+
+            videoTarget.addEventListener("targetLost", () => {
+                console.log("目标丢失，暂停视频");
+                statusEl.innerHTML = "🔍 目标丢失，请重新对准";
+                video.pause();
+            });
+
+            const sceneEl = document.querySelector('a-scene');
+            sceneEl.addEventListener('arReady', () => {
+                video.pause();
+                console.log("AR系统已就绪，视频已准备好播放。");
+            });
+        });
+    </script>
+</body>
+
+</html>
